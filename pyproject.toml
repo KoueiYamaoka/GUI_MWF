@@ -1,0 +1,30 @@
+[tool.poetry]
+name = "mwf"
+version = "0.1.0"
+description = ""
+authors = ["Kouei Yamaoka <kouei525@gmail.com>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.11"
+numpy = "^1.26.4"
+matplotlib = "^3.9.0"
+wxpython = "^4.2.1"
+pysoundfile = "^0.9.0.post1"
+sounddevice = "^0.4.7"
+
+[tool.poetry.group.dev.dependencies]
+ruff = "^0.4.8"
+python-lsp-server = {version = "^1.11.0", extras = ["all"]}
+isort = "^5.13.2"
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
+
+[tool.ruff]
+extend = "~/.config/ruff/ruff.toml"
+
+[tool.ruff.lint.pep8-naming]
+extend-ignore-names = ["V", "W", "X", "Y", "V_inv"]
+
