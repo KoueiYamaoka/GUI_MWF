@@ -90,3 +90,54 @@ class ParamSizer(wx.StaticBoxSizer):
         """Get mu value from the slider."""
         obj = evt.GetEventObject()
         self.mwfo.mu = obj.GetValue()
+
+
+class DataSizer(wx.StaticBoxSizer):
+    """Sizer to place data-related buttons, etc."""
+
+    def __init__(self, parent, fontsize, mwfo) -> None:
+        # prepare box
+        bx = wx.StaticBox(parent, wx.ID_ANY, "Data loader")
+
+        # Initialization
+        super().__init__(bx, wx.VERTICAL)
+        self.mwfo = mwfo
+
+        # generate slider
+        txt_snr = wx.StaticText(parent, label="SNR")
+        sl_snr = wx.Slider(
+            parent,
+            wx.ID_ANY,
+            style=wx.SL_LABELS,
+            value=self.mwfo.snr,
+            minValue=-40,
+            maxValue=40,
+            size=(400, 100),
+        )
+
+        # set font
+        font = wx.Font(
+            fontsize, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL
+        )
+        bx.SetFont(font)
+        txt_snr.SetFont(font)
+        sl_snr.SetFont(font)
+        sl_snr.SetBackgroundColour(parent.GetBackgroundColour())
+
+        # set slider
+        self.Add(txt_snr, flag=wx.LEFT | wx.TOP, border=border)
+        self.Add(sl_snr, flag=wx.LEFT | wx.TOP | wx.BOTTOM, border=border)
+
+        # set event for slider
+        sl_snr.Bind(wx.EVT_SLIDER, self.set_snr)
+
+    def set_snr(self, evt) -> None:
+        """Get SNR value from the slider."""
+        obj = evt.GetEventObject()
+        self.mwfo.snr = obj.GetValue()
+
+        self.mwfo.set_data_snr()
+        self.mwfo.transform(self.mwfo.train)
+        self.mwfo.transform(self.mwfo.test)
+        self.mwfo.calc_features()
+        self.mwfo.filter_init()

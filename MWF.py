@@ -92,6 +92,23 @@ class MWF:
         self.train = train
         self.test = test
 
+    def set_data_snr(self) -> None:
+        """Set data SNR."""
+        # load
+        self.raw.n, _ = utils.set_snr(self.raw.x, self.raw.n, self.snr)
+
+        # train
+        self.train.s = self.raw.s[5 * self.fs + 1 :]
+        self.train.i = self.raw.i[5 * self.fs + 1 :]
+        self.train.n = self.raw.n[5 * self.fs + 1 :]
+        self.train.x = self.train.s + np.sum(self.train.i, axis=-1) + self.train.n
+
+        # test
+        self.test.s = self.raw.s[0 : 5 * self.fs]
+        self.test.i = self.raw.i[0 : 5 * self.fs]
+        self.test.n = self.raw.n[0 : 5 * self.fs]
+        self.test.x = self.test.s + np.sum(self.test.i, axis=-1) + self.test.n
+
     def transform(
         self,
         signal: SIGNAL,
