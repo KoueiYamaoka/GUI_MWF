@@ -66,7 +66,7 @@ class ParamSizer(wx.StaticBoxSizer):
             style=wx.SL_LABELS,
             value=self.mwfo.mu,
             minValue=0,
-            maxValue=100,
+            maxValue=30,
             size=(400, 100),
         )
 
@@ -103,6 +103,9 @@ class DataSizer(wx.StaticBoxSizer):
         super().__init__(bx, wx.VERTICAL)
         self.mwfo = mwfo
 
+        # set button
+        bt_ply = wx.Button(parent, wx.ID_ANY, "Play", style=wx.RB_GROUP)
+
         # generate slider
         txt_snr = wx.StaticText(parent, label="SNR")
         sl_snr = wx.Slider(
@@ -119,17 +122,20 @@ class DataSizer(wx.StaticBoxSizer):
         font = wx.Font(
             fontsize, wx.FONTFAMILY_DEFAULT, wx.FONTSTYLE_NORMAL, wx.FONTWEIGHT_NORMAL
         )
+        bt_ply.SetFont(font)
         bx.SetFont(font)
         txt_snr.SetFont(font)
         sl_snr.SetFont(font)
         sl_snr.SetBackgroundColour(parent.GetBackgroundColour())
 
         # set slider
+        self.Add(bt_ply, flag=wx.LEFT, border=border)
         self.Add(txt_snr, flag=wx.LEFT | wx.TOP, border=border)
         self.Add(sl_snr, flag=wx.LEFT | wx.TOP | wx.BOTTOM, border=border)
 
         # set event for slider
         sl_snr.Bind(wx.EVT_SLIDER, self.set_snr)
+        bt_ply.Bind(wx.EVT_BUTTON, self.ply)
 
     def set_snr(self, evt) -> None:
         """Get SNR value from the slider."""
@@ -141,3 +147,7 @@ class DataSizer(wx.StaticBoxSizer):
         self.mwfo.transform(self.mwfo.test)
         self.mwfo.calc_features()
         self.mwfo.filter_init()
+
+    def ply(self, evt) -> None:
+        """Play observation."""
+        sd.play(self.mwfo.x, self.mwfo.fs)

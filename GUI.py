@@ -15,12 +15,12 @@ class AppMWF(wx.App):
         target_path = "wav/dev1_female3_liverec_130ms_5cm_sim_1.wav"
         interf_paths = [
             "wav/dev1_female3_liverec_130ms_5cm_sim_2.wav",
-            "wav/dev1_female3_liverec_130ms_5cm_sim_3.wav",
+            # "wav/dev1_female3_liverec_130ms_5cm_sim_3.wav",
         ]
 
         # prepare MWF
         self.mwfo = MWF.MWF()
-        self.mwfo.load_data(target_path, interf_paths)
+        self.mwfo.load_data(target_path, interf_paths, snr=10)
         self.mwfo.transform(self.mwfo.train)
         self.mwfo.transform(self.mwfo.test)
         self.mwfo.calc_features()

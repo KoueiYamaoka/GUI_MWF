@@ -45,10 +45,9 @@ class MWF:
     def __init__(self) -> None:
         """Initialize."""
         self.rg = default_rng(577)
-        self.snr = 20
         self.mu = 1
 
-    def load_data(self, target_path: str, interf_paths: list) -> None:
+    def load_data(self, target_path: str, interf_paths: list, snr: int = 20) -> None:
         """
         Load data.
 
@@ -60,7 +59,12 @@ class MWF:
         interf_paths: list of str
             relative paths to the interferer signals
 
+        snr: int
+            input SNR (signal-plus-interferes to noise ratio)
+
         """
+        self.snr = snr
+
         # load
         raw = SIGNAL()
         raw.s, self.fs = sf.read(target_path)
@@ -152,8 +156,8 @@ class MWF:
 
     def filter_init(self) -> None:
         """Compute numerator and denominator of MWF coefficients except for mu."""
-        # alias
-        self.x = self.test.x
+        # aliases
+        self.x = self._mod_amp(self.test.x)
         self.X = self.test.X
 
         # preparation

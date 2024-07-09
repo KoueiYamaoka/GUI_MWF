@@ -1,4 +1,5 @@
 import matplotlib as mpl
+import numpy as np
 import wx
 from matplotlib.backends.backend_wxagg import FigureCanvasWxAgg
 
@@ -9,9 +10,10 @@ mpl.use("WXAgg")
 class PlotPanel(wx.Panel):
     """Panel for displaying spectrograms inherited from wx.Panel."""
 
-    def __init__(self, parent, size, mwfo) -> None:
+    def __init__(self, parent, size, fs, mwfo) -> None:
         super().__init__(parent, wx.ID_ANY, size=size)
         self.fps = 5  # frame per second
+        self.fs = fs
         self.mwfo = mwfo
 
         # mpl figure
@@ -28,6 +30,7 @@ class PlotPanel(wx.Panel):
         sizer = wx.BoxSizer(wx.VERTICAL)
         sizer.Add(self.canvas, 1, wx.EXPAND)
         self.SetSizer(sizer)
+        self.draw_init()
         self.draw()
 
         # set timer for figures update
@@ -40,8 +43,28 @@ class PlotPanel(wx.Panel):
         self.mwfo.calc_spectrogram()
         self.draw(evt)
 
+    def draw_init(self) -> None:
+        self.di = dict(
+            fbin=np.round(np.linspace(0, self.mwfo.X.shape[0], 9)).astype(int),
+            fbin_txt=[str(i) for i in [0, 1, 2, 3, 4, 5, 6, 7, 8]],
+            frm=np.linspace(0, self.mwfo.X.shape[2] - 1, 6),
+            frm_txt=[str(i) for i in range(6)],
+        )
+
+        styles = {
+            "font.size": self.fs + 1,
+            "xtick.labelsize": self.fs - 2,
+            "ytick.labelsize": self.fs - 2,
+            "figure.labelsize": self.fs + 1,
+            "axes.labelsize": self.fs + 1,
+            "axes.labelpad": 7,
+            "axes.titlesize": self.fs + 1,
+        }
+        mpl.pyplot.rcParams.update(styles)
+
     def draw(self, evt=None) -> None:
         """Routine for drawing figures."""
+
         # observation
         self.subplot1.cla()
         self.subplot1.imshow(
@@ -53,9 +76,14 @@ class PlotPanel(wx.Panel):
             vmax=6,
             interpolation="antialiased",
         )
+
         self.subplot1.set_title("Observation")
-        self.subplot1.set_xlabel("Time")
-        self.subplot1.set_ylabel("Frequency")
+        self.subplot1.set_xlabel("Time [s]")
+        self.subplot1.set_ylabel("Frequency [kHz]")
+        self.subplot1.set_yticks(self.di["fbin"])
+        self.subplot1.set_yticklabels(self.di["fbin_txt"])
+        self.subplot1.set_xticks(self.di["frm"])
+        self.subplot1.set_xticklabels(self.di["frm_txt"])
 
         # output
         self.subplot2.cla()
@@ -69,7 +97,11 @@ class PlotPanel(wx.Panel):
             interpolation="antialiased",
         )
         self.subplot2.set_title("Enhanced signal")
-        self.subplot2.set_xlabel("Time")
-        self.subplot2.set_ylabel("Frequency")
+        self.subplot2.set_xlabel("Time [s]")
+        self.subplot2.set_ylabel("Frequency [kHz]")
+        self.subplot2.set_yticks(self.di["fbin"])
+        self.subplot2.set_yticklabels(self.di["fbin_txt"])
+        self.subplot2.set_xticks(self.di["frm"])
+        self.subplot2.set_xticklabels(self.di["frm_txt"])
 
         self.canvas.draw()

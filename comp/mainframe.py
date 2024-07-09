@@ -11,6 +11,7 @@ class MainFrame(wx.Frame):
         # size
         self.width = 1080 + 460
         self.height = 1080
+        self.fs = 16
 
         # size calculation
         self.r_width = self.width - self.height
@@ -19,7 +20,7 @@ class MainFrame(wx.Frame):
         super().__init__(
             None,
             wx.ID_ANY,
-            "Multichannel Weiner Filtering",
+            "Speech Distortion Weighted Multichannel Weiner Filter",
             size=(self.width, self.height),
         )
 
@@ -31,7 +32,7 @@ class MainFrame(wx.Frame):
         p_main = wx.Panel(self, wx.ID_ANY)
 
         # child panels under the main panel
-        p_plot = PlotPanel(p_main, (self.height, self.height), mwfo)
+        p_plot = PlotPanel(p_main, (self.height, self.height), self.fs, mwfo)
         p_param = ParameterPanel(p_main, (self.r_width, self.height), mwfo)
 
         # layout of child panels
