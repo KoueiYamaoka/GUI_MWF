@@ -1,7 +1,12 @@
+"""Main file for starting the GUI."""
+
+from pathlib import Path
+
 import wx
 
 import MWF
 from comp.mainframe import MainFrame
+from functions.my_exceptions import SourceNumberError
 
 
 class AppMWF(wx.App):
@@ -12,15 +17,19 @@ class AppMWF(wx.App):
     """
 
     def OnInit(self) -> None:
-        target_path = "wav/dev1_female3_liverec_130ms_5cm_sim_1.wav"
-        interf_paths = [
-            "wav/dev1_female3_liverec_130ms_5cm_sim_2.wav",
-            # "wav/dev1_female3_liverec_130ms_5cm_sim_3.wav",
-        ]
+        # load
+        target_dir = Path("wav/target")
+        interf_dir = Path("wav/interf")
+
+        target_path = [str(f) for f in target_dir.glob("*.wav")]
+        interf_paths = [str(f) for f in interf_dir.glob("*.wav")]
+
+        if len(target_path) != 1:
+            raise SourceNumberError("target", 1)
 
         # prepare MWF
         self.mwfo = MWF.MWF()
-        self.mwfo.load_data(target_path, interf_paths, snr=10)
+        self.mwfo.load_data(target_path[0], interf_paths, snr=10)
         self.mwfo.transform(self.mwfo.train)
         self.mwfo.transform(self.mwfo.test)
         self.mwfo.calc_features()

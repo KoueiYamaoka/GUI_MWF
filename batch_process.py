@@ -1,19 +1,20 @@
 """Test script of multichannel Wiener filter."""
 
+from pathlib import Path
+
 import MWF
 
 if __name__ == "__main__":
-    # initialization
-
     # load
-    target_path = "wav/dev1_female3_liverec_130ms_5cm_sim_1.wav"
-    interf_paths = [
-        "wav/dev1_female3_liverec_130ms_5cm_sim_2.wav",
-        "wav/dev1_female3_liverec_130ms_5cm_sim_3.wav",
-    ]
+    target_dir = Path("wav/target")
+    interf_dir = Path("wav/interf")
 
+    target_path = [str(f) for f in target_dir.glob("*.wav")]
+    interf_paths = [str(f) for f in interf_dir.glob("*.wav")]
+
+    # main
     stream = MWF.MWF()
-    stream.load_data(target_path, interf_paths)
+    stream.load_data(target_path[0], interf_paths)
     stream.transform(stream.train)
     stream.transform(stream.test)
     stream.calc_features()

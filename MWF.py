@@ -67,10 +67,16 @@ class MWF:
 
         # load
         raw = SIGNAL()
+
+        # target signal
         raw.s, self.fs = sf.read(target_path)
+
+        # interferers
         raw.i = np.zeros(raw.s.shape + (len(interf_paths),))
         for i, p in enumerate(interf_paths):
             raw.i[:, :, i], _ = sf.read(p)
+
+        # noise and mixture
         raw.x = raw.s + np.sum(raw.i, axis=2)
         raw.n = self.rg.random(np.shape(raw.s))
         raw.n, _ = utils.set_snr(raw.x, raw.n, self.snr)

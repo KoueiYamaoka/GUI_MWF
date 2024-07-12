@@ -104,4 +104,6 @@ class PlotPanel(wx.Panel):
         self.subplot2.set_xticks(self.di["frm"])
         self.subplot2.set_xticklabels(self.di["frm_txt"])
 
+        self.figure.tight_layout()
+
         self.canvas.draw()
