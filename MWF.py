@@ -1,4 +1,4 @@
-"""MWF: multichannel Wiener filter."""
+"""SDW-MWF: speech distortion weighted multichannel Wiener filter."""
 
 from __future__ import annotations
 
@@ -42,12 +42,19 @@ class SIGNAL:
 class MWF:
     """Class: Multichannel Wiener Filter (MWF)."""
 
-    def __init__(self) -> None:
+    def __init__(self, config: dict) -> None:
         """Initialize."""
-        self.rg = default_rng(577)
-        self.mu = 1
+        self.config = config
 
-    def load_data(self, target_path: str, interf_paths: list, snr: int = 20) -> None:
+        self.rg = default_rng(config["Simulation"]["seed"])
+        self.snr = config["Simulation"]["SNR"]
+        self.snr_range = config["Simulation"]["SNR_range"]
+        self.mu = config["Parameters"]["mu"]
+        self.frlen = config["Parameters"]["frame_length"]
+        self.frsft = config["Parameters"]["frame_shift"]
+        self.maxmu = config["Parameters"]["max_mu_range"]
+
+    def load_data(self, target_path: str, interf_paths: list) -> None:
         """
         Load data.
 
@@ -58,13 +65,7 @@ class MWF:
 
         interf_paths: list of str
             relative paths to the interferer signals
-
-        snr: int
-            input SNR (signal-plus-interferes to noise ratio)
-
         """
-        self.snr = snr
-
         # load
         raw = SIGNAL()
 
@@ -88,15 +89,16 @@ class MWF:
         train = SIGNAL()
 
         # train
-        train.s = self.raw.s[5 * self.fs + 1 :]
-        train.i = self.raw.i[5 * self.fs + 1 :]
-        train.n = self.raw.n[5 * self.fs + 1 :]
+        tmp = len(self.raw.x) // 2
+        train.s = self.raw.s[tmp + 1 :]
+        train.i = self.raw.i[tmp + 1 :]
+        train.n = self.raw.n[tmp + 1 :]
         train.x = train.s + np.sum(train.i, axis=-1) + train.n
 
         # test
-        test.s = self.raw.s[0 : 5 * self.fs]
-        test.i = self.raw.i[0 : 5 * self.fs]
-        test.n = self.raw.n[0 : 5 * self.fs]
+        test.s = self.raw.s[0:tmp]
+        test.i = self.raw.i[0:tmp]
+        test.n = self.raw.n[0:tmp]
         test.x = test.s + np.sum(test.i, axis=-1) + test.n
 
         self.train = train
@@ -108,28 +110,25 @@ class MWF:
         self.raw.n, _ = utils.set_snr(self.raw.x, self.raw.n, self.snr)
 
         # train
-        self.train.s = self.raw.s[5 * self.fs + 1 :]
-        self.train.i = self.raw.i[5 * self.fs + 1 :]
-        self.train.n = self.raw.n[5 * self.fs + 1 :]
+        tmp = len(self.raw.x) // 2
+        self.train.s = self.raw.s[tmp + 1 :]
+        self.train.i = self.raw.i[tmp + 1 :]
+        self.train.n = self.raw.n[tmp + 1 :]
         self.train.x = self.train.s + np.sum(self.train.i, axis=-1) + self.train.n
 
         # test
-        self.test.s = self.raw.s[0 : 5 * self.fs]
-        self.test.i = self.raw.i[0 : 5 * self.fs]
-        self.test.n = self.raw.n[0 : 5 * self.fs]
+        self.test.s = self.raw.s[0:tmp]
+        self.test.i = self.raw.i[0:tmp]
+        self.test.n = self.raw.n[0:tmp]
         self.test.x = self.test.s + np.sum(self.test.i, axis=-1) + self.test.n
 
     def transform(
         self,
         signal: SIGNAL,
-        frlen: int = 2048,
-        frsft: int | None = None,
         wnd: NDArray[np.float64] | None = None,
     ) -> None:
         """Perform STFT."""
         # parameters
-        self.frlen = frlen
-        self.frsft = self.frlen // 2 if frsft is None else frsft
         self.wnd = np.hamming(self.frlen) if wnd is None else wnd
 
         # STFT

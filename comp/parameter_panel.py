@@ -9,11 +9,10 @@ class ParameterPanel(wx.Panel):
     def __init__(self, parent, size, mwfo) -> None:
         super().__init__(parent, wx.ID_ANY, size=size)
 
-        fontsize = 12
         # generate panels
-        layout_data = pp.DataSizer(self, fontsize, mwfo)
-        layout_run = pp.RunSizer(self, fontsize, mwfo)
-        layout_param = pp.ParamSizer(self, fontsize, mwfo)
+        layout_data = pp.DataSizer(self, mwfo)
+        layout_run = pp.RunSizer(self, mwfo)
+        layout_param = pp.ParamSizer(self, mwfo)
 
         # set panels
         layout = wx.BoxSizer(wx.VERTICAL)

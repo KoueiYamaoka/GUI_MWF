@@ -1,5 +1,6 @@
 """Main file for starting the GUI."""
 
+import tomllib
 from pathlib import Path
 
 import wx
@@ -18,18 +19,22 @@ class AppMWF(wx.App):
 
     def OnInit(self) -> None:
         # load
-        target_dir = Path("wav/target")
-        interf_dir = Path("wav/interf")
+        with open("config.toml", "rb") as f:
+            config = tomllib.load(f)
+
+        target_dir = Path(config["Paths"]["target_dir"])
+        interf_dir = Path(config["Paths"]["interf_dir"])
 
         target_path = [str(f) for f in target_dir.glob("*.wav")]
         interf_paths = [str(f) for f in interf_dir.glob("*.wav")]
+        snr = config["Simulation"]["SNR"]
 
         if len(target_path) != 1:
             raise SourceNumberError("target", 1)
 
         # prepare MWF
-        self.mwfo = MWF.MWF()
-        self.mwfo.load_data(target_path[0], interf_paths, snr=10)
+        self.mwfo = MWF.MWF(config)
+        self.mwfo.load_data(target_path[0], interf_paths)
         self.mwfo.transform(self.mwfo.train)
         self.mwfo.transform(self.mwfo.test)
         self.mwfo.calc_features()
@@ -39,7 +44,7 @@ class AppMWF(wx.App):
         self.mwfo.calc_spectrogram()
 
         # generate GUI
-        frame = MainFrame(self.mwfo)
+        frame = MainFrame(self.mwfo, config)
 
         # set event
         frame.Bind(wx.EVT_CLOSE, self.ExitHandler)

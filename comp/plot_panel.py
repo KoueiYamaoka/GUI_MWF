@@ -10,10 +10,12 @@ mpl.use("WXAgg")
 class PlotPanel(wx.Panel):
     """Panel for displaying spectrograms inherited from wx.Panel."""
 
-    def __init__(self, parent, size, fs, mwfo) -> None:
+    def __init__(self, parent, size, font, mwfo) -> None:
         super().__init__(parent, wx.ID_ANY, size=size)
         self.fps = 5  # frame per second
-        self.fs = fs
+        self.font = font
+        self.fs = font.GetPointSize()
+        self.ff = font.GetFaceName()
         self.mwfo = mwfo
 
         # mpl figure
@@ -52,6 +54,7 @@ class PlotPanel(wx.Panel):
         )
 
         styles = {
+            "font.family": self.ff,
             "font.size": self.fs + 1,
             "xtick.labelsize": self.fs - 2,
             "ytick.labelsize": self.fs - 2,
@@ -77,7 +80,7 @@ class PlotPanel(wx.Panel):
             interpolation="antialiased",
         )
 
-        self.subplot1.set_title("Observation")
+        self.subplot1.set_title("Observed signal")
         self.subplot1.set_xlabel("Time [s]")
         self.subplot1.set_ylabel("Frequency [kHz]")
         self.subplot1.set_yticks(self.di["fbin"])

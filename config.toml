@@ -1,0 +1,28 @@
+[GUI]
+width = 1200 # Three-quarters of width is used for spectrograms
+height = 800
+base_font_size = 14
+font_family = 4
+# 0: DEFAULT
+# 1: DECORATIVE (decorative)
+# 2: ROMAN (formal, serif)
+# 3: SCRIPT (handwriting)
+# 4: SWISS (sans-serif)
+# 5: MODERN (fixed pitch)
+# 6: TELETYPE (monospaced)
+# See font overview of wxPython for details
+
+[Paths]
+target_dir = "data/target"
+interf_dir = "data/interf"
+
+[Simulation]
+seed = 577
+SNR = 20
+SNR_range = [-20, 40]
+
+[Parameters]
+frame_length = 2048
+frame_shift = 1024
+mu = 1
+max_mu_range = 30
