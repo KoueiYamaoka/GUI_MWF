@@ -2,17 +2,16 @@
 name = "mwf"
 version = "0.1.0"
 description = ""
-authors = ["Kouei Yamaoka <kouei525@gmail.com>"]
+authors = ["Kouei Yamaoka <kyamaoka298@gmail.com>"]
 readme = "README.md"
 
 [tool.poetry.dependencies]
-python = ">=3.11,<3.13"
+python = "^3.12"
 numpy = "^1.26.4"
 matplotlib = "^3.9.0"
 wxpython = "^4.2.1"
 pysoundfile = "^0.9.0.post1"
 sounddevice = "^0.4.7"
-pyinstaller = "^6.9.0"
 
 [tool.poetry.group.dev.dependencies]
 ruff = "^0.4.8"
